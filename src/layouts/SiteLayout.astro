@@ -1,0 +1,138 @@
+---
+import { getJourney } from "../lib/journey";
+import { locales, pathFor, translations, type Locale } from "../lib/i18n";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  currentId?: string;
+  locale?: Locale;
+}
+
+const { title, description, currentId, locale = "be" } = Astro.props;
+const t = translations[locale];
+const journey = await getJourney(locale);
+const navStops = journey.map((entry, index) => {
+  const progress = journey.length === 1 ? 0.5 : index / (journey.length - 1);
+  const x = 12 + progress * 76;
+  const distanceFromCenter = (x / 100 - 0.5) * 2;
+  const curveHeight = 1 - (120 / 220) * (1 - distanceFromCenter ** 2);
+
+  return {
+    entry,
+    index,
+    x,
+    y: curveHeight * 100,
+  };
+});
+---
+
+<!doctype html>
+<html lang={t.languageCode}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#101315" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="site">
+      <svg class="sky-field" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="sky-gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#dce9e5" />
+            <stop offset="100%" stop-color="#c5d9d9" />
+          </linearGradient>
+        </defs>
+        <path d="M0 0H1000V220Q500 100 0 220Z" />
+      </svg>
+
+      <a class="moon corner corner-moon" href={pathFor(locale)} aria-label={t.homeLabel}>
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <circle class="moon-disc" cx="32" cy="32" r="27" />
+          <circle class="moon-crater" cx="22" cy="20" r="3" />
+          <circle class="moon-crater" cx="41" cy="26" r="2" />
+          <circle class="moon-crater" cx="30" cy="43" r="4" />
+          <circle class="moon-crater" cx="45" cy="42" r="1.5" />
+        </svg>
+      </a>
+
+      <details class="corner corner-gatha" open>
+        <summary aria-label={t.gathaLabel}>
+          <svg class="gatha-constellation" viewBox="0 0 48 48" aria-hidden="true">
+            <polygon class="constellation-star" points="9,4 10.5,8.5 15,10 10.5,11.5 9,16 7.5,11.5 3,10 7.5,8.5" />
+            <polygon class="constellation-star" points="24,16 25.5,20.5 30,22 25.5,23.5 24,28 22.5,23.5 18,22 22.5,20.5" />
+            <polygon class="constellation-star" points="39,28 40.5,32.5 45,34 40.5,35.5 39,40 37.5,35.5 33,34 37.5,32.5" />
+          </svg>
+          <span class="visually-hidden">{t.gathaLabel}</span>
+          <span class="gatha-copy">{t.gatha}</span>
+        </summary>
+      </details>
+
+      <nav class="wheel-nav" aria-label={t.navigation}>
+        <ol>
+          <svg
+            class="wheel-arc"
+            viewBox="0 0 1000 220"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path d="M0 220Q500 100 1000 220" />
+          </svg>
+          {navStops.map(({ entry, index, x, y }) => (
+            <li style={`--stop-x: ${x}%; --stop-y: ${y}%;`}>
+              <a
+                href={pathFor(locale, entry.data.nodeId)}
+                aria-current={entry.data.nodeId === currentId ? "page" : undefined}
+                class:list={{ "wheel-stop": true, "is-current": entry.data.nodeId === currentId }}
+              >
+                <span class="stop-number">{String(index + 1).padStart(2, "0")}</span>
+                <span>{entry.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <main id="main-content" class="reading-panel" tabindex="0">
+        <slot />
+      </main>
+
+      <aside class="corner corner-map" aria-label={t.map}>
+        <span>{t.map}</span>
+        <span class="map-status">{t.later}</span>
+      </aside>
+
+      <details class="corner corner-menu">
+        <summary aria-label={t.menuLabel}>
+          <span class="menu-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          <span class="visually-hidden">{t.language}</span>
+        </summary>
+        <div class="menu-content">
+          <span class="menu-label">{t.language}</span>
+          <nav aria-label={t.language}>
+            {locales.map((targetLocale) => (
+              <a
+                href={pathFor(
+                  targetLocale,
+                  currentId,
+                )}
+                lang={translations[targetLocale].languageCode}
+                aria-current={targetLocale === locale ? "page" : undefined}
+                class:list={{ "language-link": true, "is-current": targetLocale === locale }}
+              >
+                {t.languageNames[targetLocale]}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </details>
+    </div>
+  </body>
+</html>

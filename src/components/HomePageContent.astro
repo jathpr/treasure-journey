@@ -1,0 +1,22 @@
+---
+import { translations, type Locale } from "../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = translations[locale];
+---
+
+<div class="intro">
+  <p class="eyebrow">{t.homeEyebrow}</p>
+  <h1>{t.homeHeading}</h1>
+  <p class="lead">{t.homeLead}</p>
+</div>
+
+<section class="welcome-section" aria-labelledby="welcome-title">
+  <p class="eyebrow">{t.howToRead}</p>
+  <h2 id="welcome-title">{t.eachStep}</h2>
+  <p>{t.mapDescription}</p>
+</section>

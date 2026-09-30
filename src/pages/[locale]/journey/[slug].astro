@@ -1,0 +1,81 @@
+---
+import { render, type CollectionEntry } from "astro:content";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+import { locales, pathFor, translations, type Locale } from "../../../lib/i18n";
+import { getJourney } from "../../../lib/journey";
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const locale of locales.filter((item) => item !== "be")) {
+    const journey = await getJourney(locale);
+    for (const entry of journey) {
+      paths.push({
+        params: { locale, slug: entry.data.nodeId },
+        props: { entry, locale },
+      });
+    }
+  }
+  return paths;
+}
+
+const { entry, locale } = Astro.props as {
+  entry: CollectionEntry<"journey">;
+  locale: Locale;
+};
+const t = translations[locale];
+const journey = await getJourney(locale);
+const currentIndex = journey.findIndex((item) => item.data.nodeId === entry.data.nodeId);
+const linkedEntries = entry.data.linksTo.map((id) =>
+  journey.find((item) => item.data.nodeId === id),
+);
+const { Content } = await render(entry);
+---
+
+<SiteLayout
+  title={`${entry.data.title} — ${t.homeTitle}`}
+  description={entry.data.summary}
+  currentId={entry.data.nodeId}
+  locale={locale}
+>
+  <article class="step">
+    <header class="step-header">
+      <p class="eyebrow">{t.step} {String(entry.data.order).padStart(2, "0")}</p>
+      <h1>{entry.data.title}</h1>
+      <p class="lead">{entry.data.summary}</p>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {linkedEntries.length > 0 && (
+      <nav class="connections" aria-label={t.related}>
+        <p class="eyebrow">{t.related}</p>
+        <ul>
+          {linkedEntries.map((linkedEntry) => linkedEntry && (
+            <li>
+              <a class="text-link" href={pathFor(locale, linkedEntry.data.nodeId)}>
+                {linkedEntry.data.title} <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+
+    <nav class="step-pagination" aria-label={t.navigation}>
+      {currentIndex > 0 && (
+        <a href={pathFor(locale, journey[currentIndex - 1].data.nodeId)}>
+          <span class="eyebrow">{t.previous}</span>
+          <span>{journey[currentIndex - 1].data.title}</span>
+        </a>
+      )}
+      {currentIndex < journey.length - 1 && (
+        <a class="next-step" href={pathFor(locale, journey[currentIndex + 1].data.nodeId)}>
+          <span class="eyebrow">{t.next}</span>
+          <span>{journey[currentIndex + 1].data.title} <span aria-hidden="true">→</span></span>
+        </a>
+      )}
+    </nav>
+  </article>
+</SiteLayout>

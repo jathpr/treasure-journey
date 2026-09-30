@@ -1,0 +1,561 @@
+:root {
+  color-scheme: dark;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --bg: #101315;
+  --text: #e8e5dc;
+  --muted: #a5a69e;
+  --line: #333a39;
+  --accent: #d5bd83;
+  --sky-text: #293b3d;
+  --sky-muted: #50686a;
+  --sky-height: clamp(150px, 26vh, 220px);
+  --nav-curve-offset: 28px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  min-height: 100svh;
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.7;
+  background: radial-gradient(ellipse at 50% 45%, #1b2020 0, #131717 58%, #101315 100%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible,
+summary:focus-visible,
+.reading-panel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 5px;
+}
+
+.site {
+  position: relative;
+  width: min(1180px, calc(100% - 64px));
+  height: 100svh;
+  min-height: 680px;
+  max-height: 1100px;
+  margin: 0 auto;
+  isolation: isolate;
+}
+
+.sky-field {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  height: var(--sky-height);
+  overflow: visible;
+  filter: drop-shadow(0 1px 1px rgb(41 59 61 / 38%));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.sky-field path {
+  fill: url("#sky-gradient");
+}
+
+.corner {
+  position: absolute;
+  z-index: 2;
+  color: var(--sky-muted);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.corner-moon {
+  top: 4vh;
+  left: 2px;
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+}
+
+.moon svg {
+  width: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 20px rgb(213 189 131 / 18%));
+}
+
+.moon-disc {
+  fill: #fffdf5;
+}
+
+.moon-crater {
+  fill: #bdc9c4;
+  opacity: 0.72;
+}
+
+.corner-gatha {
+  top: 4vh;
+  right: 54px;
+  max-width: 240px;
+}
+
+.corner-gatha summary {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.corner-gatha summary::-webkit-details-marker,
+.corner-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.gatha-constellation {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  overflow: visible;
+  fill: #fff0bd;
+  filter: drop-shadow(0 0 5px rgb(255 240 189 / 48%));
+}
+
+.constellation-star {
+  stroke: none;
+}
+
+.gatha-copy {
+  display: none;
+  max-width: 230px;
+  color: var(--sky-text);
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.corner-gatha[open] .gatha-constellation {
+  display: none;
+}
+
+.corner-gatha[open] .gatha-copy {
+  display: block;
+}
+
+.wheel-nav {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  height: var(--sky-height);
+  overflow: visible;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.wheel-nav ol,
+.connections ul,
+.card-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wheel-nav ol {
+  position: absolute;
+  inset: 0;
+}
+
+.wheel-arc {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: translateY(var(--nav-curve-offset));
+  pointer-events: none;
+}
+
+.wheel-arc path {
+  fill: none;
+  stroke: rgb(165 166 158 / 42%);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.wheel-nav li {
+  position: absolute;
+  top: var(--stop-y);
+  left: var(--stop-x);
+  transform: translate(-50%, calc(-50% + var(--nav-curve-offset)));
+  pointer-events: auto;
+}
+
+.wheel-stop {
+  display: grid;
+  width: clamp(68px, 9vw, 104px);
+  justify-items: center;
+  gap: 3px;
+  padding: 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.25;
+  text-align: center;
+  transition: color 160ms ease;
+}
+
+.wheel-stop:hover,
+.wheel-stop.is-current {
+  color: var(--text);
+}
+
+.stop-number {
+  display: grid;
+  width: 24px;
+  flex: 0 0 auto;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid #69716b;
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: 0.62rem;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.wheel-stop.is-current .stop-number,
+.wheel-stop:hover .stop-number {
+  border-color: var(--accent);
+  background: rgb(213 189 131 / 9%);
+  color: var(--accent);
+}
+
+.reading-panel {
+  position: absolute;
+  top: 34%;
+  bottom: 13%;
+  left: 50%;
+  width: min(76%, 820px);
+  overflow: auto;
+  padding: 18px 24px 28px;
+  overscroll-behavior: contain;
+  scrollbar-color: #59605a transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  transform: translateX(-50%);
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 22px;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+
+h2 {
+  margin-bottom: 14px;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.eyebrow {
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.lead {
+  max-width: 680px;
+  color: #c5c4bb;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.intro {
+  padding-bottom: 34px;
+}
+
+.intro .text-link {
+  display: none;
+}
+
+.welcome-section {
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.welcome-section > p:not(.eyebrow) {
+  max-width: 680px;
+  color: var(--muted);
+}
+
+.step-header {
+  margin-bottom: 30px;
+}
+
+.prose {
+  max-width: 680px;
+  color: #cfcec6;
+  font-size: 1.06rem;
+}
+
+.prose p {
+  margin-bottom: 1.35em;
+}
+
+.connections {
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.connections ul {
+  display: grid;
+  gap: 8px;
+}
+
+.text-link {
+  color: var(--accent);
+}
+
+.text-link span {
+  display: inline-block;
+  margin-left: 6px;
+  transition: transform 160ms ease;
+}
+
+.text-link:hover span {
+  transform: translateX(4px);
+}
+
+.step-pagination {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 38px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.step-pagination a {
+  display: grid;
+  gap: 5px;
+}
+
+.step-pagination .eyebrow {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.next-step {
+  margin-left: auto;
+  text-align: right;
+}
+
+.corner-map {
+  right: 2px;
+  bottom: 4vh;
+  display: grid;
+  gap: 2px;
+  text-align: right;
+}
+
+.map-status {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.corner-menu {
+  top: calc(var(--sky-height) + 30px);
+  right: 2px;
+}
+
+.corner-menu summary {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  cursor: pointer;
+  list-style: none;
+}
+
+.menu-icon {
+  display: grid;
+  width: 22px;
+  gap: 5px;
+}
+
+.menu-icon span {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--sky-text);
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.corner-menu[open] .menu-icon span:first-child {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.corner-menu[open] .menu-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.corner-menu[open] .menu-icon span:last-child {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.menu-content {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  display: grid;
+  min-width: 160px;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: #171b1c;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 24%);
+}
+
+.menu-label {
+  color: var(--sky-muted);
+  font-size: 0.68rem;
+}
+
+.menu-content nav {
+  display: grid;
+  gap: 5px;
+}
+
+.language-link {
+  padding: 3px 0;
+  color: var(--sky-text);
+}
+
+.language-link:hover,
+.language-link.is-current {
+  color: #101315;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@media (max-width: 720px) {
+  :root {
+    --sky-height: clamp(150px, 27vh, 190px);
+    --nav-curve-offset: 24px;
+  }
+
+  .site {
+    width: calc(100% - 32px);
+    min-height: 680px;
+    max-height: none;
+  }
+
+  .corner-moon {
+    top: 28px;
+    left: 0;
+    width: 42px;
+    height: 42px;
+  }
+
+  .corner-gatha {
+    top: 28px;
+    right: 50px;
+    max-width: min(240px, 70vw);
+  }
+
+  .corner-gatha summary {
+    min-height: 42px;
+  }
+
+  .gatha-constellation {
+    width: 32px;
+    height: 32px;
+  }
+
+  .corner-gatha[open] .gatha-copy {
+    max-width: min(220px, 65vw);
+    font-size: 0.84rem;
+  }
+
+  .wheel-stop {
+    width: 84px;
+    font-size: 0.72rem;
+  }
+
+  .reading-panel {
+    top: 230px;
+    right: 0;
+    bottom: 96px;
+    left: 0;
+    width: 100%;
+    padding: 14px 14px 24px;
+    transform: none;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 9vw, 2.8rem);
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+
+  .corner-menu {
+    top: calc(var(--sky-height) + 78px);
+    right: 0;
+  }
+
+  .corner-map {
+    right: 0;
+    bottom: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none;
+  }
+}

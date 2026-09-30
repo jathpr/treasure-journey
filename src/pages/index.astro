@@ -1,0 +1,10 @@
+---
+import HomePageContent from "../components/HomePageContent.astro";
+import { translations } from "../lib/i18n";
+import SiteLayout from "../layouts/SiteLayout.astro";
+const t = translations.be;
+---
+
+<SiteLayout title={t.homeTitle} description={t.homeDescription}>
+  <HomePageContent locale="be" />
+</SiteLayout>

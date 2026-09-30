@@ -1,0 +1,23 @@
+---
+import HomePageContent from "../../components/HomePageContent.astro";
+import { locales, translations, type Locale } from "../../lib/i18n";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export function getStaticPaths() {
+  return locales.filter((locale) => locale !== "be").map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const t = translations[locale];
+---
+
+<SiteLayout
+  title={t.homeTitle}
+  description={t.homeDescription}
+  locale={locale}
+>
+  <HomePageContent locale={locale} />
+</SiteLayout>
