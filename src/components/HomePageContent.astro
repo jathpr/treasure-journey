@@ -1,5 +1,5 @@
 ---
-import { translations, type Locale } from "../lib/i18n";
+import { pathFor, translations, type Locale } from "../lib/i18n";
 
 interface Props {
   locale: Locale;
@@ -10,13 +10,12 @@ const t = translations[locale];
 ---
 
 <div class="intro">
-  <p class="eyebrow">{t.homeEyebrow}</p>
-  <h1>{t.homeHeading}</h1>
-  <p class="lead">{t.homeLead}</p>
+  <h1>{t.homeGreeting}</h1>
+  <p class="lead">{t.homeIntro}</p>
 </div>
 
-<section class="welcome-section" aria-labelledby="welcome-title">
-  <p class="eyebrow">{t.howToRead}</p>
-  <h2 id="welcome-title">{t.eachStep}</h2>
-  <p>{t.mapDescription}</p>
-</section>
+<nav class="home-actions" aria-label={t.homeNavigation}>
+  <a class="home-action" href={pathFor(locale, "theory")}>{t.theory}</a>
+  <a class="home-action" href={pathFor(locale, "practice")}>{t.practice}</a>
+  <a class="home-action" href={pathFor(locale, "why")}>{t.why}</a>
+</nav>

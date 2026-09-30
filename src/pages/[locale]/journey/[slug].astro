@@ -45,6 +45,12 @@ const { Content } = await render(entry);
     </header>
 
     <div class="prose">
+      {entry.data.media === "video" && (
+        <div class="video-placeholder" role="img" aria-label={t.videoSoon}>
+          <span class="video-play" aria-hidden="true">▶</span>
+          <span>{t.videoSoon}</span>
+        </div>
+      )}
       <Content />
     </div>
 

@@ -10,6 +10,7 @@ const journey = defineCollection({
     order: z.number().int().positive(),
     summary: z.string(),
     linksTo: z.array(z.string()).default([]),
+    media: z.enum(["none", "video"]).default("none"),
   }),
 });
 
