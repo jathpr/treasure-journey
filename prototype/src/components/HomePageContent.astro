@@ -1,0 +1,139 @@
+---
+import { render } from "astro:content";
+import { getJourney, nodeIdFor } from "../lib/journey";
+import { pathFor, type Locale } from "../lib/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const journey = await getJourney(locale);
+const home = journey.find((entry) => nodeIdFor(entry) === "home");
+
+if (!home) {
+  throw new Error(`Journey content is missing the home page for "${locale}".`);
+}
+
+// render() turns this Markdown entry into an Astro component that can be placed below.
+const { Content } = await render(home);
+const destinations = home.data.linksTo.map((nodeId) => {
+  const destination = journey.find((entry) => nodeIdFor(entry) === nodeId);
+  if (!destination) {
+    throw new Error(`Home page links to missing journey entry "${nodeId}".`);
+  }
+  return destination;
+});
+---
+
+<article class="home-page">
+  <header class="home-heading">
+    <h1>{home.data.title}</h1>
+    <p class="lead">{home.data.summary}</p>
+  </header>
+
+  <div class="home-copy">
+    <Content />
+  </div>
+
+  <nav class="home-actions" aria-label={home.data.title}>
+    {destinations.map((destination) => (
+      <a class="home-action" href={pathFor(locale, nodeIdFor(destination))}>
+        <span class="action-title">{destination.data.title}</span>
+        {destination.data.summary && (
+          <span class="action-summary">{destination.data.summary}</span>
+        )}
+      </a>
+    ))}
+  </nav>
+</article>
+
+<style>
+  .home-page {
+    display: grid;
+    align-content: start;
+    gap: 20px;
+  }
+
+  .home-heading h1 {
+    margin-bottom: 8px;
+  }
+
+  .home-heading p {
+    margin-bottom: 0;
+  }
+
+  .home-copy {
+    max-width: 680px;
+    color: #cfcec6;
+    font-size: 1.08rem;
+    line-height: 1.8;
+  }
+
+  .home-copy :global(p) {
+    margin: 0 0 1.1em;
+  }
+
+  .home-copy :global(.home-emphasis) {
+    margin-top: 20px;
+    color: var(--accent);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    letter-spacing: -0.02em;
+  }
+
+  .home-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .home-action {
+    display: grid;
+    min-height: 96px;
+    align-content: center;
+    justify-items: center;
+    gap: 5px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    color: var(--text);
+    text-align: center;
+    transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+  }
+
+  .home-action:hover {
+    border-color: var(--accent);
+    background: rgb(213 189 131 / 6%);
+    color: var(--accent);
+  }
+
+  .action-title {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+  }
+
+  .action-summary {
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  @media (max-width: 720px) {
+    .home-page {
+      gap: 14px;
+    }
+
+    .home-actions {
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .home-action {
+      min-height: 82px;
+      padding: 8px 5px;
+    }
+
+    .action-summary {
+      font-size: 0.68rem;
+    }
+  }
+</style>

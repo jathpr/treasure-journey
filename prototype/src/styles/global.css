@@ -1,0 +1,57 @@
+:root {
+  color-scheme: dark;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --bg: #101315;
+  --text: #e8e5dc;
+  --muted: #a5a69e;
+  --line: #333a39;
+  --accent: #d5bd83;
+  --sky-text: #293b3d;
+  --sky-muted: #50686a;
+  --sky-height: clamp(150px, 26vh, 220px);
+  --nav-curve-offset: 28px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  min-height: 100svh;
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.7;
+  background: radial-gradient(ellipse at 50% 45%, #1b2020 0, #131717 58%, #101315 100%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible,
+summary:focus-visible,
+.reading-panel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none;
+  }
+}

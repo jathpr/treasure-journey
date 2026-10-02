@@ -1,0 +1,37 @@
+---
+import type { CollectionEntry } from "astro:content";
+import JourneyPageContent from "../../../components/JourneyPageContent.astro";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+import { locales, translations, type Locale } from "../../../lib/i18n";
+import { getJourney, nodeIdFor } from "../../../lib/journey";
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const locale of locales.filter((item) => item !== "be")) {
+    for (const entry of await getJourney(locale)) {
+      if (nodeIdFor(entry) !== "home") {
+        paths.push({
+          params: { locale, slug: nodeIdFor(entry) },
+          props: { entry, locale },
+        });
+      }
+    }
+  }
+  return paths;
+}
+
+const { entry, locale } = Astro.props as {
+  entry: CollectionEntry<"journey">;
+  locale: Locale;
+};
+const t = translations[locale];
+---
+
+<SiteLayout
+  title={`${entry.data.title} — ${t.homeTitle}`}
+  description={entry.data.summary}
+  currentId={nodeIdFor(entry)}
+  locale={locale}
+>
+  <JourneyPageContent entry={entry} locale={locale} />
+</SiteLayout>

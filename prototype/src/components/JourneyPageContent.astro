@@ -1,0 +1,114 @@
+---
+import { render } from "astro:content";
+import { getJourney, nodeIdFor, type JourneyEntry } from "../lib/journey";
+import { pathFor, translations, type Locale } from "../lib/i18n";
+
+interface Props {
+  entry: JourneyEntry;
+  locale: Locale;
+}
+
+const { entry, locale } = Astro.props;
+const t = translations[locale];
+const journey = await getJourney(locale);
+const linkedEntries = entry.data.linksTo.map((nodeId) => {
+  const linkedEntry = journey.find((item) => nodeIdFor(item) === nodeId);
+  if (!linkedEntry) {
+    throw new Error(`Journey entry "${nodeIdFor(entry)}" links to missing entry "${nodeId}".`);
+  }
+  return linkedEntry;
+});
+const { Content } = await render(entry);
+---
+
+<article class="journey-page">
+  <header>
+    <h1>{entry.data.title}</h1>
+    {entry.data.summary && <p class="lead">{entry.data.summary}</p>}
+  </header>
+
+  <div class="page-copy">
+    <Content />
+    {entry.data.linksTo.includes("home") && (
+      <p class="back-home">
+        <a class="text-link" href={pathFor(locale, "home")}>
+          {t.homeLabel} <span aria-hidden="true">→</span>
+        </a>
+      </p>
+    )}
+  </div>
+
+  {linkedEntries.some((item) => nodeIdFor(item) !== "home") && (
+    <nav class="connections" aria-label={t.related}>
+      <p class="eyebrow">{t.related}</p>
+      <ul>
+        {linkedEntries.filter((item) => nodeIdFor(item) !== "home").map((item) => (
+          <li>
+            <a class="text-link" href={pathFor(locale, nodeIdFor(item))}>
+              {item.data.title} <span aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )}
+</article>
+
+<style>
+  .journey-page header {
+    margin-bottom: 26px;
+  }
+
+  .page-copy {
+    max-width: 680px;
+    color: #cfcec6;
+    font-size: 1.06rem;
+    line-height: 1.8;
+  }
+
+  .page-copy :global(p) {
+    margin-bottom: 1.2em;
+  }
+
+  .back-home {
+    margin-top: 32px;
+  }
+
+  .connections {
+    margin-top: 32px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+
+  .connections ul {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .text-link {
+    color: var(--accent);
+  }
+
+  .text-link span {
+    display: inline-block;
+    margin-left: 6px;
+    transition: transform 160ms ease;
+  }
+
+  .text-link:hover span {
+    transform: translateX(4px);
+  }
+
+  .eyebrow {
+    margin: 0 0 10px;
+    color: var(--accent);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+</style>
