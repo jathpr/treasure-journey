@@ -1,5 +1,5 @@
 ---
-import { pathFor } from "../lib/i18n";
+import { pathFor, translations, type Locale } from "../lib/i18n";
 
 interface Props {
   nodeId?: string;
@@ -8,7 +8,6 @@ interface Props {
 const { nodeId } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const basePath = base.endsWith("/") ? base : `${base}/`;
-const fallback = pathFor("be", nodeId);
 ---
 
 <!doctype html>
@@ -17,11 +16,35 @@ const fallback = pathFor("be", nodeId);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex" />
-    <title>Пераход да вашай мовы</title>
+    <title>Вітаю · Hello · Здравствуй</title>
   </head>
   <body>
-    <p>Пераход да версіі на вашай мове…</p>
-    <p>Калі пераход не адбыўся, <a href={fallback}>адкрыйце беларускую версію</a>.</p>
+    <main class="language-gateway">
+      <svg class="gateway-moon" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="27" />
+      </svg>
+
+      <nav
+        class="language-fallback"
+        aria-label="Выберыце мову · Choose a language · Выберите язык"
+        hidden
+      >
+        {(["be", "en", "ru"] as const).map((locale: Locale) => (
+          <a href={pathFor(locale, nodeId)} lang={translations[locale].languageCode}>
+            {locale === "be" ? "Вітаю" : locale === "en" ? "Hello" : "Здравствуй"}
+          </a>
+        ))}
+      </nav>
+    </main>
+
+    <noscript>
+      <style>
+        .language-fallback[hidden] {
+          display: flex !important;
+        }
+      </style>
+    </noscript>
+
     <script is:inline data-base={basePath} data-node={nodeId ?? ""}>
       const redirectScript = document.currentScript;
       const basePath = redirectScript.dataset.base;
@@ -29,14 +52,95 @@ const fallback = pathFor("be", nodeId);
       const supportedLocales = ["be", "ru", "en"];
       const preferredLanguages = navigator.languages?.length
         ? navigator.languages
-        : [navigator.language];
+        : [navigator.language].filter(Boolean);
       const locale = preferredLanguages
         .map((language) => language.toLowerCase().split("-")[0])
-        .find((language) => supportedLocales.includes(language)) ?? "be";
-      const localePath = `${basePath}${locale}/`;
-      const nodePath = nodeId ? `journey/${encodeURIComponent(nodeId)}/` : "";
+        .find((language) => supportedLocales.includes(language));
+      const fallback = document.querySelector(".language-fallback");
 
-      window.location.replace(`${localePath}${nodePath}`);
+      if (locale) {
+        const localePath = `${basePath}${locale}/`;
+        const nodePath = nodeId ? `journey/${encodeURIComponent(nodeId)}/` : "";
+        window.setTimeout(() => {
+          window.location.replace(`${localePath}${nodePath}`);
+        }, 220);
+        window.setTimeout(() => {
+          fallback.hidden = false;
+        }, 1800);
+      } else {
+        fallback.hidden = false;
+      }
     </script>
   </body>
 </html>
+
+<style>
+  :global(html),
+  :global(body) {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  :global(body) {
+    background: #c5d9d9;
+  }
+
+  .language-gateway {
+    display: grid;
+    min-height: 100svh;
+    place-items: center;
+    padding: 24px;
+  }
+
+  .gateway-moon {
+    width: clamp(72px, 12vw, 120px);
+    fill: #fffdf5;
+    filter: drop-shadow(0 0 24px rgb(255 253 245 / 38%));
+  }
+
+  .language-fallback {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    left: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .language-fallback[hidden] {
+    display: none;
+  }
+
+  .language-fallback a {
+    min-width: 100px;
+    padding: 10px 16px;
+    border: 1px solid rgb(41 59 61 / 35%);
+    color: #293b3d;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .language-fallback a:hover,
+  .language-fallback a:focus-visible {
+    background: rgb(255 253 245 / 35%);
+  }
+
+  @media (max-width: 480px) {
+    .language-fallback {
+      right: 16px;
+      bottom: 16px;
+      left: 16px;
+      gap: 6px;
+    }
+
+    .language-fallback a {
+      min-width: 0;
+      flex: 1;
+      padding: 10px 6px;
+      font-size: 0.9rem;
+    }
+  }
+</style>
