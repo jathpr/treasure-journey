@@ -1,6 +1,8 @@
-# New Astro project
+# Personal Astro site
 
-This folder is a separate, small Astro project. The existing site in the repository root is kept as a reference and is not imported into this project.
+This is a small, static Astro site about a personal spiritual journey.
+
+The site is published from the `dev` branch at https://jathpr.github.io/.
 
 ## Run it
 
