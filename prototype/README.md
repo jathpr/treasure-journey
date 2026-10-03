@@ -29,5 +29,6 @@ npm run preview
 - A `<style>` block in an Astro component is scoped to that component by default. `src/styles/global.css` holds only rules that are shared by the whole site.
 - `src/layouts/SiteLayout.astro` is the shared page frame. Each page puts its own content in the layout's `<slot />`.
 - `src/lib/` contains TypeScript used by pages and components: language labels/URLs, and graph loading/validation.
+- Every language has an explicit URL prefix: `/be/`, `/ru/`, and `/en/`. A request to `/` (or an old node URL without a language prefix) redirects using the browser's preferred language; if it is not Belarusian, Russian, or English, the site defaults to Belarusian. Static hosting cannot inspect the request's `Accept-Language` header at build time, so this selection happens in the browser.
 
 To add a page, create its language files under one node folder, then add that node's ID to the `linksTo` list on the page that should link to it. The graph edges, rather than a separate numeric order, define navigation.

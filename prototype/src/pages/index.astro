@@ -1,17 +1,6 @@
 ---
-import HomePageContent from "../components/HomePageContent.astro";
-import SiteLayout from "../layouts/SiteLayout.astro";
-import { translations } from "../lib/i18n";
-
-const locale = "be";
-const t = translations[locale];
+import LocaleRedirect from "../components/LocaleRedirect.astro";
 ---
 
-<SiteLayout
-  title={t.homeTitle}
-  description={t.homeDescription}
-  currentId="home"
-  locale={locale}
->
-  <HomePageContent locale={locale} />
-</SiteLayout>
+<!-- Static hosting cannot read Accept-Language, so choose from the browser's language preferences. -->
+<LocaleRedirect />

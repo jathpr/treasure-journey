@@ -56,7 +56,7 @@ export function pathFor(
   base = import.meta.env.BASE_URL,
 ) {
   const basePath = base.endsWith("/") ? base : `${base}/`;
-  const localePath = locale === "be" ? "" : `${locale}/`;
+  const localePath = `${locale}/`;
   const nodePath = nodeId && nodeId !== "home" ? `journey/${nodeId}/` : "";
   return `${basePath}${localePath}${nodePath}`;
 }

@@ -1,0 +1,42 @@
+---
+import { pathFor } from "../lib/i18n";
+
+interface Props {
+  nodeId?: string;
+}
+
+const { nodeId } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const basePath = base.endsWith("/") ? base : `${base}/`;
+const fallback = pathFor("be", nodeId);
+---
+
+<!doctype html>
+<html lang="be">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex" />
+    <title>Пераход да вашай мовы</title>
+  </head>
+  <body>
+    <p>Пераход да версіі на вашай мове…</p>
+    <p>Калі пераход не адбыўся, <a href={fallback}>адкрыйце беларускую версію</a>.</p>
+    <script is:inline data-base={basePath} data-node={nodeId ?? ""}>
+      const redirectScript = document.currentScript;
+      const basePath = redirectScript.dataset.base;
+      const nodeId = redirectScript.dataset.node;
+      const supportedLocales = ["be", "ru", "en"];
+      const preferredLanguages = navigator.languages?.length
+        ? navigator.languages
+        : [navigator.language];
+      const locale = preferredLanguages
+        .map((language) => language.toLowerCase().split("-")[0])
+        .find((language) => supportedLocales.includes(language)) ?? "be";
+      const localePath = `${basePath}${locale}/`;
+      const nodePath = nodeId ? `journey/${encodeURIComponent(nodeId)}/` : "";
+
+      window.location.replace(`${localePath}${nodePath}`);
+    </script>
+  </body>
+</html>

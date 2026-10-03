@@ -3,9 +3,9 @@ import HomePageContent from "../../components/HomePageContent.astro";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import { locales, translations, type Locale } from "../../lib/i18n";
 
-// getStaticPaths tells Astro which language home pages to generate during the build.
+// Generate a home page for each locale, including the now-explicit /be/ route.
 export function getStaticPaths() {
-  return locales.filter((locale) => locale !== "be").map((locale) => ({
+  return locales.map((locale) => ({
     params: { locale },
     props: { locale },
   }));
